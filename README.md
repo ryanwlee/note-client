@@ -1,7 +1,5 @@
 ## Things to do
 
-1. Layout two blocks
-1. menu drawer
 1. rich editor (draft js)
 1. connect apollo client
 1. get all queries
