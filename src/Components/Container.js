@@ -1,37 +1,38 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Editor from "./Editor";
+import EditScreen from "./EditScreen";
 import Drawercontent from "./Drawercontent";
 import { IconButton, Hidden, Drawer } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
-
+import { grey } from "@material-ui/core/colors";
 const drawerWidth = 240;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
     height: "100%",
     display: "flex",
-    flexDirection: "row"
+    flexDirection: "row",
   },
   drawer: {
     [theme.breakpoints.up("sm")]: {
       width: drawerWidth,
-      flexShrink: 0
-    }
+      flexShrink: 0,
+    },
   },
   drawerPaper: {
     width: drawerWidth,
-    border: "none"
+    border: "none",
   },
   menuButton: {
     marginLeft: theme.spacing(2),
     marginTop: theme.spacing(2),
+    color: grey[200],
     position: "absolute",
     [theme.breakpoints.up("sm")]: {
-      display: "none"
-    }
-  }
+      display: "none",
+    },
+  },
 }));
 
 function Container() {
@@ -61,10 +62,10 @@ function Container() {
             open={mobileOpen}
             onClose={handleDrawerToggle}
             classes={{
-              paper: classes.drawerPaper
+              paper: classes.drawerPaper,
             }}
             ModalProps={{
-              keepMounted: true
+              keepMounted: true,
             }}
           >
             <Drawercontent />
@@ -73,7 +74,7 @@ function Container() {
         <Hidden xsDown implementation="css">
           <Drawer
             classes={{
-              paper: classes.drawerPaper
+              paper: classes.drawerPaper,
             }}
             variant="permanent"
             open
@@ -82,7 +83,7 @@ function Container() {
           </Drawer>
         </Hidden>
       </nav>
-      <Editor />
+      <EditScreen />
     </div>
   );
 }

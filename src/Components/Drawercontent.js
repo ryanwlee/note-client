@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import { withStyles } from "@material-ui/core/styles";
+import { blueGrey } from "@material-ui/core/colors";
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
-    backgroundColor: "red",
-    flexGrow: "1"
-  }
+    backgroundColor: blueGrey[900],
+    flexGrow: "1",
+    borderRight: "1px solid black",
+  },
 });
 
 class Drawercontent extends Component {
