@@ -6,7 +6,10 @@ import {
   RichUtils,
   getDefaultKeyBinding,
   Modifier,
+  convertToRaw,
+  convertFromRaw,
 } from "draft-js";
+import { request } from "graphql-request";
 import InlineStyleControls from "./InlineStyleControls";
 import BlockStyleControls from "./BlockStyleControls";
 import ColorStyleControls from "./ColorStyleControls";
@@ -32,6 +35,7 @@ import {
   grey,
   blueGrey,
 } from "@material-ui/core/colors";
+import { ADD_NOTE, UPDATE_NOTE, DELETE_NOTE } from "./graphql/mutations";
 
 const styles = (theme) => ({
   root: {
@@ -119,17 +123,98 @@ const colorStyleMap = {
 class EditScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = { editorState: EditorState.createEmpty() };
+    this.state = {
+      editorState: EditorState.createEmpty(),
+      curId: "",
+      changed: false,
+    };
 
     this.focus = () => this.refs.editor.focus();
-    this.onChange = (editorState) => this.setState({ editorState });
+    this.onChange = (editorState) => {
+      this.setState({ editorState, changed: true });
+    };
 
     this.handleKeyCommand = this._handleKeyCommand.bind(this);
     this.mapKeyToEditorCommand = this._mapKeyToEditorCommand.bind(this);
     this.toggleBlockType = this._toggleBlockType.bind(this);
     this.toggleInlineStyle = this._toggleInlineStyle.bind(this);
     this.toggleColor = (toggledColor) => this._toggleColor(toggledColor);
+
+    this.updateEditorState = this.updateEditorState.bind(this);
+    this.onSave = this.onSave.bind(this);
+    this.onAdd = this.onAdd.bind(this);
+    this.onUpdate = this.onUpdate.bind(this);
+    this.onDelete = this.onDelete.bind(this);
   }
+
+  componentDidMount() {
+    console.log("mount");
+    this.updateEditorState();
+  }
+
+  componentDidUpdate() {
+    console.log("update");
+    if (this.props.curNote._id !== this.state.curId) {
+      this.updateEditorState();
+    }
+  }
+
+  updateEditorState() {
+    console.log("updateEditorState");
+    const rawEditorData = JSON.parse(this.props.curNote.content);
+    if (rawEditorData !== null) {
+      const contentState = convertFromRaw(rawEditorData);
+      this.setState({
+        editorState: EditorState.createWithContent(contentState),
+        curId: this.props.curNote._id,
+      });
+    }
+  }
+
+  onSave = async () => {
+    const jsonState = await JSON.stringify(
+      convertToRaw(this.state.editorState.getCurrentContent())
+    );
+    const curId = this.state.curId;
+    request(process.env.REACT_APP_API_SERVER, UPDATE_NOTE, {
+      _id: curId,
+      content: jsonState,
+    }).then((data) => {
+      console.log("successfully save:", data);
+      this.props.jsonData(curId);
+      this.setState({ changed: false });
+    });
+  };
+
+  onAdd = async () => {
+    const newEditorState = EditorState.createEmpty();
+    const jsonState = await JSON.stringify(
+      convertToRaw(newEditorState.getCurrentContent())
+    );
+
+    request(process.env.REACT_APP_API_SERVER, ADD_NOTE, {
+      content: jsonState,
+    }).then((data) => {
+      console.log("successfully add:", data);
+      this.props.jsonData(data.addNote._id);
+      this.setState({ changed: false });
+    });
+  };
+
+  onUpdate = async () => {
+    this.props.jsonData(this.state.curId);
+  };
+
+  onDelete = async () => {
+    const curId = this.state.curId;
+    request(process.env.REACT_APP_API_SERVER, DELETE_NOTE, {
+      _id: curId,
+    }).then((data) => {
+      console.log("successfully delete:", data);
+      this.props.jsonData();
+      this.setState({ changed: false });
+    });
+  };
 
   _handleKeyCommand(command, editorState) {
     const newState = RichUtils.handleKeyCommand(editorState, command);
@@ -204,7 +289,7 @@ class EditScreen extends Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, curNote } = this.props;
     const { editorState } = this.state;
 
     // If the user changes block type before entering any text, we can
@@ -219,7 +304,14 @@ class EditScreen extends Component {
 
     return (
       <div className={classes.root}>
-        <ActionControls className={classes.actionControls} />
+        <ActionControls
+          className={classes.actionControls}
+          onSave={this.onSave}
+          onAdd={this.onAdd}
+          onUpdate={this.onUpdate}
+          onDelete={this.onDelete}
+          changed={this.state.changed}
+        />
         <BlockStyleControls
           editorState={editorState}
           onToggle={this.toggleBlockType}
@@ -243,7 +335,7 @@ class EditScreen extends Component {
             handleKeyCommand={this.handleKeyCommand}
             keyBindingFn={this.mapKeyToEditorCommand}
             onChange={this.onChange}
-            placeholder=""
+            placeholder="Start writing something beautiful 🌈"
             ref="editor"
             spellCheck={true}
           />

@@ -1,7 +1,9 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import React, { useEffect, useState } from "react";
+import { request } from "graphql-request";
 import EditScreen from "./EditScreen";
 import Drawercontent from "./Drawercontent";
+import { GET_NOTES } from "./graphql/queries";
+import { makeStyles } from "@material-ui/core/styles";
 import { IconButton, Hidden, Drawer } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import { grey } from "@material-ui/core/colors";
@@ -43,6 +45,36 @@ function Container() {
     setMobileOpen(!mobileOpen);
   };
 
+  const handleDrawerClick = (id) => {
+    setCurNote(notes.find((note) => note._id === id));
+  };
+
+  const [notes, setNotes] = useState([""]);
+  const [curNote, setCurNote] = useState(null);
+
+  const jsonData = async (id) => {
+    request(process.env.REACT_APP_API_SERVER, GET_NOTES).then((data) => {
+      console.log("successfully got data:", data);
+      if (data && data.notes.length > 0) {
+        console.log("setting data");
+        setNotes(data.notes);
+        let findId = id ? id : data.notes[0]._id;
+        setCurNote(data.notes.find((note) => note._id === findId));
+      }
+    });
+  };
+
+  useEffect(() => {
+    request(process.env.REACT_APP_API_SERVER, GET_NOTES).then((data) => {
+      console.log("successfully got data:", data);
+      if (data && data.notes.length > 0) {
+        console.log("setting data", data);
+        setNotes(data.notes);
+        setCurNote(data.notes[0]);
+      }
+    });
+  }, []);
+
   return (
     <div className={classes.root}>
       <IconButton
@@ -54,36 +86,52 @@ function Container() {
       >
         <MenuIcon />
       </IconButton>
-      <nav className={classes.drawer}>
-        <Hidden smUp implementation="css">
-          <Drawer
-            variant="temporary"
-            anchor={"left"}
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            classes={{
-              paper: classes.drawerPaper,
-            }}
-            ModalProps={{
-              keepMounted: true,
-            }}
-          >
-            <Drawercontent />
-          </Drawer>
-        </Hidden>
-        <Hidden xsDown implementation="css">
-          <Drawer
-            classes={{
-              paper: classes.drawerPaper,
-            }}
-            variant="permanent"
-            open
-          >
-            <Drawercontent />
-          </Drawer>
-        </Hidden>
-      </nav>
-      <EditScreen />
+      {notes.length > 0 ? (
+        <nav className={classes.drawer}>
+          <Hidden smUp implementation="css">
+            <Drawer
+              variant="temporary"
+              anchor={"left"}
+              open={mobileOpen}
+              onClose={handleDrawerToggle}
+              classes={{
+                paper: classes.drawerPaper,
+              }}
+              ModalProps={{
+                keepMounted: true,
+              }}
+            >
+              <Drawercontent
+                notes={notes}
+                curId={curNote ? curNote._id : ""}
+                handleDrawerClick={handleDrawerClick}
+              />
+            </Drawer>
+          </Hidden>
+          <Hidden xsDown implementation="css">
+            <Drawer
+              classes={{
+                paper: classes.drawerPaper,
+              }}
+              variant="permanent"
+              open
+            >
+              <Drawercontent
+                notes={notes}
+                curId={curNote ? curNote._id : ""}
+                handleDrawerClick={handleDrawerClick}
+              />
+            </Drawer>
+          </Hidden>
+        </nav>
+      ) : (
+        ""
+      )}
+      {notes.length > 0 && curNote ? (
+        <EditScreen curNote={curNote} jsonData={jsonData} />
+      ) : (
+        ""
+      )}
     </div>
   );
 }

@@ -1,12 +1,34 @@
 import React, { Component } from "react";
 import { withStyles } from "@material-ui/core/styles";
-import { blueGrey } from "@material-ui/core/colors";
+import { grey } from "@material-ui/core/colors";
+import { Typography } from "@material-ui/core";
+import { convertFromRaw } from "draft-js";
+import { titleHelper } from "./helper";
 
 const styles = (theme) => ({
   root: {
-    backgroundColor: blueGrey[900],
+    backgroundColor: "#212125",
     flexGrow: "1",
-    borderRight: "1px solid black",
+    borderRight: "0.5px solid #212125",
+  },
+  list: {
+    color: grey[300],
+    height: "80px",
+    borderBottom: "1px solid #34374c",
+    display: "flex",
+    cursor: "pointer",
+  },
+  selectedList: {
+    backgroundColor: "#1d1919",
+    color: grey[300],
+    height: "80px",
+    borderBottom: "1px solid #34374c",
+    display: "flex",
+    cursor: "pointer",
+  },
+  listText: {
+    color: grey[300],
+    margin: "auto 10px auto 10px",
   },
 });
 
@@ -17,9 +39,40 @@ class Drawercontent extends Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, notes, handleDrawerClick, curId } = this.props;
 
-    return <div className={classes.root} />;
+    return (
+      <div className={classes.root}>
+        {notes.length > 0
+          ? notes.map((note) => {
+              if (note.content === undefined) {
+                return "";
+              }
+              let content = convertFromRaw(
+                JSON.parse(note.content)
+              ).getPlainText();
+
+              return (
+                <div
+                  className={
+                    note._id === curId ? classes.selectedList : classes.list
+                  }
+                  key={note._id}
+                  onClick={() => handleDrawerClick(note._id)}
+                >
+                  <Typography
+                    variant="body1"
+                    gutterBottom
+                    className={classes.listText}
+                  >
+                    {titleHelper(content)}
+                  </Typography>
+                </div>
+              );
+            })
+          : ""}
+      </div>
+    );
   }
 }
 

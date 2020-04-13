@@ -8,7 +8,8 @@ import { grey } from "@material-ui/core/colors";
 
 const useStyles = makeStyles((theme) => ({
   root: { display: "flex", flexDirection: "row-reverse" },
-  icon: { color: grey[400], marginRight: "10px" },
+  icon: { color: grey[400], marginRight: "10px", cursor: "pointer" },
+  text: { color: grey[600], marginRight: "30px" },
 }));
 
 const ActionControls = (props) => {
@@ -16,10 +17,15 @@ const ActionControls = (props) => {
 
   return (
     <div className={classes.root}>
-      <DeleteIcon className={classes.icon} />
-      <CachedIcon className={classes.icon} />
-      <SaveIcon className={classes.icon} />
-      <CreateIcon className={classes.icon} />
+      <DeleteIcon className={classes.icon} onClick={props.onDelete} />
+      <CachedIcon className={classes.icon} onClick={props.onUpdate} />
+      <SaveIcon className={classes.icon} onClick={props.onSave} />
+      <CreateIcon className={classes.icon} onClick={props.onAdd} />
+      {props.changed ? (
+        <div className={classes.text}>Some changes. Make sure save!</div>
+      ) : (
+        ""
+      )}
     </div>
   );
 };
