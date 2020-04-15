@@ -4,7 +4,7 @@ Everybody loves Macbook note app. What if it is web app? Anywhere with any devic
 
 Check the [DEMO](https://ryanwlee.com/note)
 
-![Image](https://github.com/ryanwlee/note-client/src/img/note.gif)
+![Image](https://github.com/ryanwlee/note-client/blob/master/src/img/note.gif)
 
 ## What did I use to build this?
 
