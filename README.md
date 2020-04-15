@@ -1,8 +1,15 @@
-## Things to do
+## Note, inspired by Mac note
 
-1. rich editor (draft js)
-1. connect apollo client
-1. get all queries
-1. display all notes
-1. display content with rich editor (click title for changing content)
-1. edit and save
+Everybody loves Macbook note app. What if it is web app? Anywhere with any devices?
+
+Check the [DEMO](https://ryanwlee.com/note)
+
+## What did I use to build this?
+
+Graphql & Apollo server & MongoDB & React JS & Draft JS.
+
+[server](https://github.com/ryanwlee/note)
+
+## What is next?
+
+Let me know if there is any issue! Love to fix. Also, React Native will be available soon.
