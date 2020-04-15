@@ -4,11 +4,12 @@ import EditScreen from "./EditScreen";
 import Drawercontent from "./Drawercontent";
 import { GET_NOTES } from "./graphql/queries";
 import { makeStyles } from "@material-ui/core/styles";
-import { IconButton, Hidden, Drawer } from "@material-ui/core";
+import { IconButton, Hidden, Drawer, Modal } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import { grey } from "@material-ui/core/colors";
-const drawerWidth = 240;
+import Spinner from "../img/spinner.svg";
 
+const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -35,6 +36,14 @@ const useStyles = makeStyles((theme) => ({
       display: "none",
     },
   },
+  LoadingModal: {
+    textAlign: "center",
+  },
+  Spinner: {
+    marginTop: "300px",
+    outline: "none",
+    width: "90px",
+  },
 }));
 
 function Container() {
@@ -51,6 +60,7 @@ function Container() {
 
   const [notes, setNotes] = useState([""]);
   const [curNote, setCurNote] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const jsonData = async (id) => {
     request(process.env.REACT_APP_API_SERVER, GET_NOTES).then((data) => {
@@ -61,6 +71,7 @@ function Container() {
         let findId = id ? id : data.notes[0]._id;
         setCurNote(data.notes.find((note) => note._id === findId));
       }
+      setLoading(false);
     });
   };
 
@@ -72,11 +83,16 @@ function Container() {
         setNotes(data.notes);
         setCurNote(data.notes[0]);
       }
+      setLoading(false);
     });
   }, []);
 
   return (
     <div className={classes.root}>
+      <Modal open={loading} onClose={() => {}} className={classes.LoadingModal}>
+        <img src={Spinner} className={classes.Spinner} alt={"spinner"} />
+      </Modal>
+
       <IconButton
         color="inherit"
         aria-label="open drawer"
@@ -128,7 +144,11 @@ function Container() {
         ""
       )}
       {notes.length > 0 && curNote ? (
-        <EditScreen curNote={curNote} jsonData={jsonData} />
+        <EditScreen
+          curNote={curNote}
+          jsonData={jsonData}
+          setLoading={setLoading}
+        />
       ) : (
         ""
       )}

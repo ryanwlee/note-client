@@ -36,6 +36,7 @@ import {
   blueGrey,
 } from "@material-ui/core/colors";
 import { ADD_NOTE, UPDATE_NOTE, DELETE_NOTE } from "./graphql/mutations";
+import editorbg from "../img/editorbg.png";
 
 const styles = (theme) => ({
   root: {
@@ -43,7 +44,7 @@ const styles = (theme) => ({
     display: "flex",
     flexDirection: "column",
     background: grey[900],
-    fontFamily: '"Georgia", serif',
+    backgroundImage: `url(${editorbg})`,
     fontSize: "14px",
     padding: "15px",
     color: grey[100],
@@ -55,11 +56,7 @@ const styles = (theme) => ({
       paddingRight: "30px",
     },
   },
-  editor: {
-    backgroundColor: grey[900],
-    height: "100%",
-    padding: theme.spacing(2),
-  },
+  editor: {},
   blockStyleControls: {
     backgroundColor: grey[800],
     width: "100%",
@@ -172,6 +169,7 @@ class EditScreen extends Component {
   }
 
   onSave = async () => {
+    this.props.setLoading(true);
     const jsonState = await JSON.stringify(
       convertToRaw(this.state.editorState.getCurrentContent())
     );
@@ -187,6 +185,7 @@ class EditScreen extends Component {
   };
 
   onAdd = async () => {
+    this.props.setLoading(true);
     const newEditorState = EditorState.createEmpty();
     const jsonState = await JSON.stringify(
       convertToRaw(newEditorState.getCurrentContent())
@@ -202,10 +201,12 @@ class EditScreen extends Component {
   };
 
   onUpdate = async () => {
+    this.props.setLoading(true);
     this.props.jsonData(this.state.curId);
   };
 
   onDelete = async () => {
+    this.props.setLoading(true);
     const curId = this.state.curId;
     request(process.env.REACT_APP_API_SERVER, DELETE_NOTE, {
       _id: curId,
@@ -289,7 +290,7 @@ class EditScreen extends Component {
   }
 
   render() {
-    const { classes, curNote } = this.props;
+    const { classes } = this.props;
     const { editorState } = this.state;
 
     // If the user changes block type before entering any text, we can
@@ -338,6 +339,7 @@ class EditScreen extends Component {
             placeholder="Start writing something beautiful 🌈"
             ref="editor"
             spellCheck={true}
+            className={classes.editor}
           />
         </div>
       </div>

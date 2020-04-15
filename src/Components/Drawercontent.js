@@ -7,22 +7,23 @@ import { titleHelper } from "./helper";
 
 const styles = (theme) => ({
   root: {
-    backgroundColor: "#212125",
+    backgroundColor: "#1d1920",
     flexGrow: "1",
     borderRight: "0.5px solid #212125",
   },
   list: {
+    backgroundColor: "#1f2125",
     color: grey[300],
-    height: "80px",
-    borderBottom: "1px solid #34374c",
+    height: "70px",
+    borderBottom: "1px solid #1d1919",
     display: "flex",
     cursor: "pointer",
   },
   selectedList: {
     backgroundColor: "#1d1919",
     color: grey[300],
-    height: "80px",
-    borderBottom: "1px solid #34374c",
+    height: "70px",
+    borderBottom: "1px solid #1d1919",
     display: "flex",
     cursor: "pointer",
   },
